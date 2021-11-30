@@ -11,9 +11,12 @@ def main():
     
     links = list(filter(lambda x: x.startswith('__'), links))
     
+    i = 0
     for link in tqdm.tqdm(links):
         process(link)
-        time.sleep(1)
+        i += 1
+        if i % 10 == 0:
+            time.sleep(1)
 
 def process(link):
     try:
