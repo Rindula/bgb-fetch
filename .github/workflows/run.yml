@@ -1,0 +1,32 @@
+name: 🚩 Daten aktualisieren
+
+on:
+    schedule:
+        - cron: '0 0 * * *'
+    workflow_dispatch:
+
+jobs:
+    run:
+        name: Refresh data
+        runs-on: ubuntu-latest
+        env:
+            TZ: "Europe/Berlin"
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: 🛠 Set up Python 3.10
+              uses: actions/setup-python@v2
+              with:
+                  python-version: '3.10'
+            - name: 🔧 Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+            - name: ⏩ Run the Script
+              run: |
+                  python main.py
+            - uses: EndBug/add-and-commit@v7
+              with:
+                add: data
+                default_author: github_actions
+                message: "Update data"
