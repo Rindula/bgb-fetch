@@ -4,6 +4,12 @@ import tqdm
 import html
 import time
 
+CLEANR = re.compile('<.*?>')
+
+def cleanhtml(raw_html):
+  cleantext = re.sub(CLEANR, '', raw_html)
+  return cleantext
+
 def main():
     start = requests.get('https://www.gesetze-im-internet.de/bgb/')
     # use regex to get all links
@@ -26,7 +32,8 @@ def process(link):
         with open(f'data/{paragraph[0]}.md', 'w') as f:
             f.write(f'# {titel[0]}\n\n')
             for p in absaetze:
-                f.write(f'- {p}\n\n')
+                ph = cleanhtml(p)
+                f.write(f'- {ph}\n\n')
     except Exception as e:
         pass
 
