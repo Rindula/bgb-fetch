@@ -1,6 +1,6 @@
 .PHONY: run
 
-run: venv
+run: venv main.py
 	venv/bin/python3 main.py
 
 venv: requirements.txt
