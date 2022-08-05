@@ -34,7 +34,7 @@ def process(link):
         # save to file
         with open(f'data/{paragraph[0]}.md', 'w') as f:
             f.write(f'# {titel[0]}\n\n')
-            f.write(markdownify.markdownify(gesetz[0]))
+            f.write(markdownify.markdownify(gesetz))
     except Exception as e:
         pass
 
