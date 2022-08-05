@@ -3,6 +3,7 @@ import re
 import tqdm
 import html
 import time
+import markdownify
 
 CLEANR = re.compile('<.*?>')
 
@@ -27,13 +28,13 @@ def process(link):
         text = html.unescape(requests.get(f'https://www.gesetze-im-internet.de/bgb/{link}').text)
         paragraph = re.findall(r"<span class=\"jnenbez\">\§ (\d*?)<\/span>", text)
         titel = re.findall(r"<span class=\"jnentitel\">([\w\s]*?)<\/span>", text)
-        absaetze = re.findall(r"<div class=\"jurAbsatz\">(.*?)<\/div>", text)
+        gesetz = re.findall(r"<div class=\"jnhtml\">(.*?)<\/div>", text)[0]
+        gesetz = re.sub('<d[dt][^>]*?>', ' ', gesetz)
+        gesetz = re.sub('<\/d[dt][^>]*?>', "\n", gesetz)
         # save to file
         with open(f'data/{paragraph[0]}.md', 'w') as f:
             f.write(f'# {titel[0]}\n\n')
-            for p in absaetze:
-                ph = cleanhtml(p)
-                f.write(f'- {ph}\n\n')
+            f.write(markdownify.markdownify(gesetz[0]))
     except Exception as e:
         pass
 
