@@ -1,3 +1,3 @@
-tqdm
-requests
-markdownify
+tqdm==4.66.1
+requests==2.31.0
+markdownify==0.11.6
