@@ -1,6 +1,7 @@
+from concurrent.futures import ThreadPoolExecutor
 import requests
 import re
-from rich.progress import Progress
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeRemainingColumn
 from rich.traceback import install
 import html
 import time
@@ -20,15 +21,20 @@ def main():
     
     links = list(filter(lambda x: x.startswith('__'), links))
     
-    with Progress() as progress:
-        update = progress.add_task("[green]Downloading...", total=len(links))
-        for i, link in enumerate(links):
-            process(link, progress)
-            progress.update(update, advance=1)
-            if i % 20 == 0:
-                time.sleep(1)
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold blue]Fortschritt", justify="right"),
+        BarColumn(),
+        "[progress.percentage]{task.percentage:>3.1f}%",
+        TimeRemainingColumn(),
+        ) as progress:
+        update_task = progress.add_task("Fetching texts", total=len(links))
+        with ThreadPoolExecutor(max_workers=10) as pool:
+            for link in links:
+                pool.submit(process, link, progress, update_task)
+                
 
-def process(link, progress):
+def process(link, progress, task_id):
     try:
         text = html.unescape(requests.get(f'https://www.gesetze-im-internet.de/bgb/{link}').text)
         paragraph = re.findall(r"<span class=\"jnenbez\">(?:§|&#167;) (\d*?\w?)<\/span>", text)
@@ -57,6 +63,8 @@ def process(link, progress):
     except Exception as e:
         progress.console.log(e, style='bold red', log_locals=True)
         pass
+    finally:
+        progress.advance(task_id)
 
 if __name__ == "__main__":
     main()
