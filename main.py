@@ -56,6 +56,10 @@ def process(link, progress, task_id):
         if gesetz == '':
             progress.console.log(f'No gesetz found in {link}', style='bold red')
             return
+        
+        # split gesetz at \(\d+\) and add new line before
+        gesetz = re.sub(r'\(\d+\)', '\n\n## \g<0>\n\n', gesetz)
+        
         with open(f'data/{paragraph[0]}.md', 'w') as f:
             f.write(f'# {titel[0]}\n\n')
             f.write(markdownify.markdownify(gesetz))
