@@ -29,7 +29,7 @@ def main():
         TimeRemainingColumn(),
         ) as progress:
         update_task = progress.add_task("Fetching texts", total=len(links))
-        with ThreadPoolExecutor(max_workers=10) as pool:
+        with ThreadPoolExecutor(max_workers=4) as pool:
             for link in links:
                 pool.submit(process, link, progress, update_task)
                 
